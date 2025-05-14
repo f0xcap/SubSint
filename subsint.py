@@ -13,7 +13,7 @@ def resolve_domain(domain):
         return "Resolution Failed"
 
 def fetch_domains(target):
-    crtsh_url = f'https://crt.sh/?q={target}&output=html'
+    crtsh_url = f'https://crt.sh/?q={target}'
     response = requests.get(crtsh_url)
     soup = BeautifulSoup(response.text, "html.parser")
     domains = set()
