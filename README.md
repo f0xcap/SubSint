@@ -21,4 +21,17 @@ Install dependencies using:
 
 ```bash
 pip install -r requirements.txt
+```
+
+## Usage
+### Signle domain mode
+
+```bash
+python subsint.py example.com
+```
+
+### List mode
+```bash
+python subsint.py -l domains.txt
+```
 
