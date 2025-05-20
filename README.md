@@ -24,7 +24,7 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-### Signle domain mode
+### Single domain mode
 
 ```bash
 python subsint.py example.com
