@@ -1,5 +1,4 @@
 import argparse
-from bs4 import BeautifulSoup
 import requests
 import dns.resolver
 import sys
@@ -13,26 +12,37 @@ def resolve_domain(domain):
         return "Resolution Failed"
 
 def fetch_domains(target):
-    crtsh_url = f'https://crt.sh/?q={target}'
-    response = requests.get(crtsh_url)
-    soup = BeautifulSoup(response.text, "html.parser")
+    crtsh_url = f'https://crt.sh/?q={target}&output=json'
+    
+    try:
+        response = requests.get(crtsh_url, timeout=15)
+        response.raise_for_status()
+        data = response.json()
+    except Exception as e:
+        print(f"Error fetching data for {target}: {e}")
+        return set()
+
     domains = set()
 
-    rows = soup.find_all("tr")[2:]  # Skip headers
-    for row in rows:
-        cells = row.find_all('td')
-        if len(cells) >= 6:
-            identities_cell = cells[5]
-            for entry in identities_cell.stripped_strings:
-                if not entry.startswith("*."):
-                    domains.add(entry)
+    for entry in data:
+        name_value = entry.get("name_value", "")
+        
+        # crt.sh may return multiple domains separated by newline
+        for domain in name_value.splitlines():
+            domain = domain.strip()
+            if domain and not domain.startswith("*."):
+                domains.add(domain)
 
     return domains
 
-parser = argparse.ArgumentParser(description='Fetch subdomains from crt.sh and resolve to IPs.')
+parser = argparse.ArgumentParser(
+    description='Fetch subdomains from crt.sh (JSON) and resolve to IPs.'
+)
+
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('domain', nargs='?', help='Single domain to query (e.g., example.com)')
 group.add_argument('-l', '--list', help='File containing a list of domains (one per line)')
+
 args = parser.parse_args()
 
 input_domains = []
@@ -59,4 +69,3 @@ print("-" * 70)
 for dom in sorted(all_found_domains):
     ip = resolve_domain(dom)
     print(f"{dom:<40} {ip:<30}")
-

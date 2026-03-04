@@ -14,7 +14,6 @@ This Python script queries [crt.sh](https://crt.sh) for certificates issued for 
 
 - Python 3.7+
 - `requests`
-- `beautifulsoup4`
 - `dnspython`
 
 Install dependencies using:
